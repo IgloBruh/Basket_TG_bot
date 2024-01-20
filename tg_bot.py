@@ -91,8 +91,10 @@ def button_click(update: Update, context: CallbackContext) -> None:
             conn_thread.commit()
 
             # Send a new message when someone joins
-            context.bot.send_message(chat_id, f"Участник {user} записался на {event_key}",
-                                     reply_to_message_id=query.message.message_id)
+            context.bot.send_message(
+                chat_id,
+                f"Участник {user} записался на {event_key}",
+                reply_to_message_id=query.message.message_id)
     elif action == "leave":
         if user in event_data[2]:
             new_participants.remove(user)
@@ -103,14 +105,16 @@ def button_click(update: Update, context: CallbackContext) -> None:
             conn_thread.commit()
 
             # Send a message when someone leaves
-            context.bot.send_message(chat_id, f"Участник {user} отказался от записи на {event_key}",
-                                     reply_to_message_id=query.message.message_id)
+            context.bot.send_message(
+                chat_id,
+                f"Участник {user} отказался от записи на {event_key}",
+                reply_to_message_id=query.message.message_id)
 
     # Update the message_text with the new participant list
     # {', '.join(new_participants[1:])}
     new_message_text = f"{event_key}\n\nУчастники: "
     for i in range(1, len(new_participants)):
-        new_message_text +=  '\n' + str(i) + '. ' + new_participants[i]
+        new_message_text += '\n' + str(i) + '. ' + new_participants[i]
 
     try:
         context.bot.edit_message_text(new_message_text,
