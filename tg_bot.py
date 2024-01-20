@@ -46,7 +46,6 @@ def start_event(update: Update, context: CallbackContext) -> None:
         'SELECT * FROM events WHERE chat_id=? AND event_key=?',
         (chat_id, event_key))
     event_data = cursor_thread.fetchone()
-    print(event_data)
 
     # Close the connection specific to this thread
     conn_thread.close()
@@ -92,8 +91,8 @@ def button_click(update: Update, context: CallbackContext) -> None:
             conn_thread.commit()
 
             # Send a new message when someone joins
-            context.bot.send_message(
-                chat_id, f"Участник {user} записался на {event_key}")
+            context.bot.send_message(chat_id, f"Участник {user} записался на {event_key}",
+                                     reply_to_message_id=query.message.message_id)
     elif action == "leave":
         if user in event_data[2]:
             new_participants.remove(user)
@@ -104,11 +103,14 @@ def button_click(update: Update, context: CallbackContext) -> None:
             conn_thread.commit()
 
             # Send a message when someone leaves
-            context.bot.send_message(
-                chat_id, f"Участник {user} отказался от записи на {event_key}")
+            context.bot.send_message(chat_id, f"Участник {user} отказался от записи на {event_key}",
+                                     reply_to_message_id=query.message.message_id)
 
     # Update the message_text with the new participant list
-    new_message_text = f"{event_key}\n\nУчастники: {','.join(new_participants)}"
+    # {', '.join(new_participants[1:])}
+    new_message_text = f"{event_key}\n\nУчастники: "
+    for i in range(1, len(new_participants)):
+        new_message_text +=  '\n' + str(i) + '. ' + new_participants[i]
 
     try:
         context.bot.edit_message_text(new_message_text,
